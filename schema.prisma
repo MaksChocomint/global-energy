@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+model Admin {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String // Предполагается, что пароль будет зашифрован перед сохранением
+}
+
+model Block {
+  id        Int      @id @default(autoincrement())
+  name      String
+  topics    Topic[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Topic {
+  id        Int      @id @default(autoincrement())
+  name      String
+  blockId   Int
+  block     Block    @relation(fields: [blockId], references: [id])
+  texts     Text[]
+  charts    Chart[]  // Обратное отношение к модели Chart
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Text {
+  id        Int      @id @default(autoincrement())
+  content   String
+  topicId   Int
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Chart {
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      ChartType?
+  data      Json
+  options   Json?
+  topicId   Int
+  topic     Topic    @relation(fields: [topicId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ChartType {
+  LINE
+  BAR
+  PIE
+  DOUGHNUT
+  POLARAREA
+  RADAR
+  SCATTER
+  BUBBLE
+  AREA
+  MIXED
+}

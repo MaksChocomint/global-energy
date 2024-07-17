@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Chart" ALTER COLUMN "type" DROP NOT NULL;
